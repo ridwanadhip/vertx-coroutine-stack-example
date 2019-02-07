@@ -7,6 +7,7 @@ import io.netty.util.internal.logging.Log4J2LoggerFactory
 import io.vertx.core.http.HttpServer
 import io.vertx.core.logging.Logger
 import io.vertx.core.logging.LoggerFactory
+import io.vertx.ext.auth.jdbc.JDBCAuth
 import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.*
@@ -19,7 +20,8 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 class HttpServerVerticle : CoroutineVerticle() {
     private lateinit var httpServer: HttpServer
     private lateinit var router: Router
-    lateinit var jdbcClient: JDBCClient
+    lateinit var db: JDBCClient
+    lateinit var auth: JDBCAuth
     lateinit var logger: Logger
 
     override suspend fun start() {
@@ -41,16 +43,18 @@ class HttpServerVerticle : CoroutineVerticle() {
             router.mountSubRouter(controller.prefix, controller.router)
         }
 
-        jdbcClient = JDBCClient.createShared(vertx, json {
+        db = JDBCClient.createShared(vertx, json {
             obj(
                     "provider_class" to "io.vertx.ext.jdbc.spi.impl.HikariCPDataSourceProvider",
                     "driverClassName" to "org.postgresql.Driver",
                     "jdbcUrl" to "jdbc:postgresql://$DBMS_HOST:$DBMS_PORT/$DBMS_DATABASE",
                     "username" to DBMS_USERNAME,
-                    "password" to DBMS_PASSWORD
+                    "password" to DBMS_PASSWORD,
+                    "castUUID" to true
             )
         })
 
+        auth = JDBCAuth.create(vertx, db)
         httpServer.requestHandler(router).listen()
     }
 
