@@ -20,6 +20,7 @@
         <postgresql.version>42.2.5</postgresql.version>
         <log4j2.version>2.11.1</log4j2.version>
         <hikaricp.version>3.3.0</hikaricp.version>
+        <jooq.version>3.11.9</jooq.version>
     </properties>
 
     <dependencies>
@@ -94,6 +95,11 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>${hikaricp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>${jooq.version}</version>
         </dependency>
     </dependencies>
 

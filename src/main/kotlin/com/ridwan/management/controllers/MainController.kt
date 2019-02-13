@@ -8,8 +8,13 @@ import com.ridwan.management.verticles.HttpServerVerticle
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
+import io.vertx.kotlin.ext.sql.getConnectionAwait
 import io.vertx.kotlin.ext.sql.queryAwait
+import io.vertx.kotlin.ext.sql.queryWithParamsAwait
 import io.vertx.kotlin.ext.sql.updateWithParamsAwait
+import org.jooq.SQLDialect
+import org.jooq.impl.DSL
+import org.jooq.impl.DSL.*
 import java.lang.Exception
 import java.util.*
 
@@ -25,9 +30,20 @@ class MainController(verticle: HttpServerVerticle) : Controller(verticle) {
     }
 
     private suspend fun getUsersAction(context: RoutingContext) {
-        val db = verticle.db
+        val query= DSL.using(SQLDialect.POSTGRES)
+                .select(field("username"), field("email"), field("role"))
+                .from(table("users"))
+                .where(field("is_deleted").eq("?"))
+                .sql
+
+        val parameters = json {
+            array(
+                false
+            )
+        }
+
         val result = try {
-            db.queryAwait("select username, email, role from users")
+            verticle.db.queryWithParamsAwait(query, parameters)
         } catch (e: Exception) {
             context.endAsErrorJson(500, "server error")
             return
@@ -47,17 +63,29 @@ class MainController(verticle: HttpServerVerticle) : Controller(verticle) {
         val db = verticle.db
         val auth = verticle.auth
         val salt = auth.generateSalt()
-        val param = json { array(
+        val parameters = json {
+            array(
                 UUID.randomUUID(),
                 body.getString("username"),
                 auth.computeHash(body.getString("password"), salt),
                 salt,
                 body.getString("email"),
                 body.getString("role")
-        )}
+            )
+        }
+
+        val query = DSL.using(SQLDialect.POSTGRES)
+                .insertInto(table("users"))
+                .set(field("id"), "?")
+                .set(field("username"), "?")
+                .set(field("password"), "?")
+                .set(field("salt"), "?")
+                .set(field("email"), "?")
+                .set(field("role"), "?")
+                .sql
 
         try {
-            db.updateWithParamsAwait("insert into users values(?, ?, ?, ?, ?, ?)", param)
+            db.updateWithParamsAwait(query, parameters)
         } catch (e: Exception) {
             context.endAsErrorJson(500, "server error")
             return
