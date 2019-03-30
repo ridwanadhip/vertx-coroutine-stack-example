@@ -1,9 +1,12 @@
-package com.ridwan.management.controllers
+package com.ridwan.management.controller
 
-import com.ridwan.management.ext.endAsEmptyJson
-import com.ridwan.management.ext.endAsErrorJson
-import com.ridwan.management.ext.endAsJson
-import com.ridwan.management.verticles.HttpServerVerticle
+import com.google.common.hash.Hashing
+import com.ridwan.mvc.extension.endAsEmptyJson
+import com.ridwan.mvc.extension.endAsErrorJson
+import com.ridwan.mvc.extension.endAsJson
+import com.ridwan.management.utility.generateRandomString
+import com.ridwan.mvc.ServerVerticle
+import com.ridwan.mvc.Controller
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
@@ -13,9 +16,11 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import java.lang.Exception
+import java.nio.charset.StandardCharsets
 import java.util.*
 
-class MainController(verticle: HttpServerVerticle) : Controller(verticle) {
+class MainController(verticle: ServerVerticle) : Controller(verticle) {
+
     override fun setupRouter() {
         routeGet("/", this::indexAction)
         routeGet("/get-users", this::getUsersAction)
@@ -57,14 +62,16 @@ class MainController(verticle: HttpServerVerticle) : Controller(verticle) {
             return
         }
 
-        val db = verticle.db
-        val auth = verticle.auth
-        val salt = auth.generateSalt()
+        val hashedPassword = Hashing
+                .sha512()
+                .hashString(body.getString("password"), StandardCharsets.UTF_8)
+
+        val salt = generateRandomString(128)
         val parameters = json {
             array(
                 UUID.randomUUID(),
                 body.getString("username"),
-                auth.computeHash(body.getString("password"), salt),
+                hashedPassword,
                 salt,
                 body.getString("email"),
                 body.getString("role")
@@ -82,7 +89,7 @@ class MainController(verticle: HttpServerVerticle) : Controller(verticle) {
                 .sql
 
         try {
-            db.updateWithParamsAwait(query, parameters)
+            verticle.db.updateWithParamsAwait(query, parameters)
         } catch (e: Exception) {
             context.endAsErrorJson(500, "server error")
             return

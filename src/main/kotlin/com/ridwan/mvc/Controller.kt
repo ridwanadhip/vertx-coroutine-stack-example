@@ -1,7 +1,6 @@
-package com.ridwan.management.controllers
+package com.ridwan.mvc
 
-import com.ridwan.management.misc.ContentType
-import com.ridwan.management.verticles.HttpServerVerticle
+import com.ridwan.mvc.constant.ContentType
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.Route
 import io.vertx.ext.web.Router
@@ -9,7 +8,7 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.launch
 
-abstract class Controller(val verticle: HttpServerVerticle) {
+abstract class Controller(val verticle: ServerVerticle) {
     open val prefix: String = "/"
     val router: Router = Router.router(verticle.vertx)
 

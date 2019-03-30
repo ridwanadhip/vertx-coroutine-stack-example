@@ -1,7 +1,7 @@
-package com.ridwan.management.ext
+package com.ridwan.mvc.extension
 
 import com.google.common.net.HttpHeaders
-import com.ridwan.management.misc.ContentType
+import com.ridwan.mvc.constant.ContentType
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext

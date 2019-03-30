@@ -16,11 +16,11 @@
         <junit.version>4.12</junit.version>
         <maven.compiler.version>3.8.0</maven.compiler.version>
         <vertx.version>3.6.3</vertx.version>
-        <guava.version>27.0.1-jre</guava.version>
+        <guava.version>27.1-jre</guava.version>
         <postgresql.version>42.2.5</postgresql.version>
         <log4j2.version>2.11.1</log4j2.version>
-        <hikaricp.version>3.3.0</hikaricp.version>
-        <jooq.version>3.11.9</jooq.version>
+        <hikaricp.version>3.3.1</hikaricp.version>
+        <jooq.version>3.11.10</jooq.version>
     </properties>
 
     <dependencies>
