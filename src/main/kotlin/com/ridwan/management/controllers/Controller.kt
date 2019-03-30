@@ -1,5 +1,6 @@
 package com.ridwan.management.controllers
 
+import com.ridwan.management.misc.ContentType
 import com.ridwan.management.verticles.HttpServerVerticle
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.Route
@@ -27,7 +28,7 @@ abstract class Controller(val verticle: HttpServerVerticle) {
     }
 
     fun routePost(path: String, handler: suspend (RoutingContext) -> Unit): Route {
-        return router.route(HttpMethod.POST, path).handler { context ->
+        return router.route(HttpMethod.POST, path).consumes(ContentType.JSON).handler { context ->
             verticle.launch(context.vertx().dispatcher()) {
                 try {
                     handler(context)

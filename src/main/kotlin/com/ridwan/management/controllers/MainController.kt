@@ -1,6 +1,5 @@
 package com.ridwan.management.controllers
 
-import com.ridwan.management.misc.ContentType
 import com.ridwan.management.ext.endAsEmptyJson
 import com.ridwan.management.ext.endAsErrorJson
 import com.ridwan.management.ext.endAsJson
@@ -8,8 +7,6 @@ import com.ridwan.management.verticles.HttpServerVerticle
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
-import io.vertx.kotlin.ext.sql.getConnectionAwait
-import io.vertx.kotlin.ext.sql.queryAwait
 import io.vertx.kotlin.ext.sql.queryWithParamsAwait
 import io.vertx.kotlin.ext.sql.updateWithParamsAwait
 import org.jooq.SQLDialect
@@ -22,7 +19,7 @@ class MainController(verticle: HttpServerVerticle) : Controller(verticle) {
     override fun setupRouter() {
         routeGet("/", this::indexAction)
         routeGet("/get-users", this::getUsersAction)
-        routePost("/add-user", this::addUserAction).consumes(ContentType.JSON)
+        routePost("/add-user", this::addUserAction)
     }
 
     private suspend fun indexAction(context: RoutingContext) {
