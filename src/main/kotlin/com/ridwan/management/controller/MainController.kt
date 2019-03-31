@@ -21,8 +21,8 @@ import java.util.*
 class MainController(verticle: MainVerticle) : Controller(verticle) {
   override fun setupRouter() {
     routeGet("/", this::indexAction)
-    routeGet("/get-users", this::getUsersAction)
-    routePost("/add-user", this::addUserAction)
+    routeGet("/user", this::getUsersAction)
+    routePost("/user", this::addUserAction)
   }
   
   private suspend fun indexAction(context: RoutingContext) {
@@ -60,17 +60,18 @@ class MainController(verticle: MainVerticle) : Controller(verticle) {
       return
     }
     
+    val password = body.getString("password")
     val salt = generateRandomString(128)
+    
     val hashedPassword = Hashing
       .sha512()
-      .hashString(salt+body.getString("password"), StandardCharsets.UTF_8)
-      .toString()
+      .hashString(salt + password, StandardCharsets.UTF_8)
     
     val parameters = json {
       array(
         UUID.randomUUID().toString(),
         body.getString("username"),
-        hashedPassword,
+        hashedPassword.toString(),
         salt,
         body.getString("email"),
         body.getString("role")

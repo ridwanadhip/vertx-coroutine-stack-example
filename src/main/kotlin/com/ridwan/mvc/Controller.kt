@@ -22,6 +22,7 @@ abstract class Controller(val verticle: ServerVerticle) {
           try {
             handler(context)
           } catch (e: Exception) {
+            verticle.logger.error(e.localizedMessage)
             context.fail(e)
           }
         }
@@ -37,6 +38,7 @@ abstract class Controller(val verticle: ServerVerticle) {
           try {
             handler(context)
           } catch (e: Exception) {
+            verticle.logger.error(e.localizedMessage)
             context.fail(e)
           }
         }

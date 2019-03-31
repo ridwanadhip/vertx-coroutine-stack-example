@@ -33,7 +33,7 @@ abstract class ServerVerticle : CoroutineVerticle() {
     db.closeAwait()
   }
   
-  abstract fun prepare()
+  abstract suspend fun prepare()
   
   abstract fun getControllers(): List<Controller>
 }
