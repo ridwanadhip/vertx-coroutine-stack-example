@@ -118,8 +118,12 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-                                <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                                <sourceDirectory>
+                                    ${project.basedir}/src/main/kotlin
+                                </sourceDirectory>
+                                <sourceDirectory>
+                                    ${project.basedir}/src/main/java
+                                </sourceDirectory>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -131,8 +135,12 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <sourceDirectory>${project.basedir}/src/test/kotlin</sourceDirectory>
-                                <sourceDirectory>${project.basedir}/src/test/java</sourceDirectory>
+                                <sourceDirectory>
+                                    ${project.basedir}/src/test/kotlin
+                                </sourceDirectory>
+                                <sourceDirectory>
+                                    ${project.basedir}/src/test/java
+                                </sourceDirectory>
                             </sourceDirs>
                         </configuration>
                     </execution>

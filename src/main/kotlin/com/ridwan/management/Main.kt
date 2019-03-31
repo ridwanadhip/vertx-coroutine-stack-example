@@ -6,6 +6,6 @@ import com.ridwan.management.verticle.MainVerticle
 import io.vertx.core.Vertx
 
 fun main() {
-    val vertx = Vertx.vertx()
-    vertx.deployVerticle(MainVerticle())
+  val vertx = Vertx.vertx()
+  vertx.deployVerticle(MainVerticle())
 }

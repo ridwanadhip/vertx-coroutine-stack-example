@@ -2,12 +2,13 @@
 <Configuration>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%-5level | %d{yyyy-MM-dd HH:mm:ss.SSS} | %msg%n" />
+            <PatternLayout
+                    pattern="%-5level | %d{yyyy-MM-dd HH:mm:ss.SSS} | %msg%n"/>
         </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">
-            <AppenderRef ref="Console" />
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
 </Configuration>
