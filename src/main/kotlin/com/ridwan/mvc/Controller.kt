@@ -29,7 +29,7 @@ abstract class Controller(val verticle: ServerVerticle) {
       .coroutineHandler(handler)
   }
   
-  fun Route.coroutineHandler(handler: suspend (RoutingContext) -> Unit): Route {
+  private fun Route.coroutineHandler(handler: suspend (RoutingContext) -> Unit): Route {
     return this.handler { context ->
       verticle.launch(context.vertx().dispatcher()) {
         try {

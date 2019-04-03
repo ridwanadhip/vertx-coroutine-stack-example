@@ -27,6 +27,10 @@ class MainVerticle : ServerVerticle() {
   override lateinit var auth: AuthProvider
   override lateinit var logger: Logger
   
+  override val controllers = arrayOf<Controller>(
+    MainController(this)
+  )
+  
   override suspend fun prepare() {
     logger = LoggerFactory.getLogger(Log4J2LoggerFactory::class.java)
     httpServer = vertx.createHttpServer(httpServerOptionsOf(
@@ -56,11 +60,5 @@ class MainVerticle : ServerVerticle() {
     
     auth = JDBCAuth.create(vertx, jdbc)
     db = jdbc
-  }
-  
-  override fun getControllers(): List<Controller> {
-    return listOf(
-      MainController(this)
-    )
   }
 }

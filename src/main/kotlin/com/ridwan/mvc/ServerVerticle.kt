@@ -16,11 +16,14 @@ abstract class ServerVerticle : CoroutineVerticle() {
   abstract val db: SQLClient
   abstract val auth: AuthProvider
   abstract val logger: Logger
+  abstract val controllers: Array<Controller>
+  
+  abstract suspend fun prepare()
   
   override suspend fun start() {
     prepare()
     
-    for (controller in getControllers()) {
+    for (controller in controllers) {
       controller.setupRouter()
       router.mountSubRouter(controller.prefix, controller.router)
     }
@@ -32,8 +35,4 @@ abstract class ServerVerticle : CoroutineVerticle() {
     httpServer.closeAwait()
     db.closeAwait()
   }
-  
-  abstract suspend fun prepare()
-  
-  abstract fun getControllers(): List<Controller>
 }
