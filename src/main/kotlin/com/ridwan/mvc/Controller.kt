@@ -17,31 +17,28 @@ abstract class Controller(val verticle: ServerVerticle) {
   fun routeGet(path: String, handler: suspend (RoutingContext) -> Unit): Route {
     return router
       .route(HttpMethod.GET, path)
-      .produces(ContentType.JSON).handler { context ->
-        verticle.launch(context.vertx().dispatcher()) {
-          try {
-            handler(context)
-          } catch (e: Exception) {
-            verticle.logger.error(e.localizedMessage)
-            context.fail(e)
-          }
-        }
-      }
+      .produces(ContentType.JSON)
+      .coroutineHandler(handler)
   }
   
   fun routePost(path: String, handler: suspend (RoutingContext) -> Unit): Route {
     return router
       .route(HttpMethod.POST, path)
       .produces(ContentType.JSON)
-      .consumes(ContentType.JSON).handler { context ->
-        verticle.launch(context.vertx().dispatcher()) {
-          try {
-            handler(context)
-          } catch (e: Exception) {
-            verticle.logger.error(e.localizedMessage)
-            context.fail(e)
-          }
+      .consumes(ContentType.JSON)
+      .coroutineHandler(handler)
+  }
+  
+  fun Route.coroutineHandler(handler: suspend (RoutingContext) -> Unit): Route {
+    return this.handler { context ->
+      verticle.launch(context.vertx().dispatcher()) {
+        try {
+          handler(context)
+        } catch (e: Exception) {
+          verticle.logger.error(e.localizedMessage)
+          context.fail(e)
         }
       }
+    }
   }
 }

@@ -29,9 +29,10 @@ class MainVerticle : ServerVerticle() {
   
   override suspend fun prepare() {
     logger = LoggerFactory.getLogger(Log4J2LoggerFactory::class.java)
-    
-    val serverOptions = httpServerOptionsOf(host = DOMAIN, port = HTTP_SERVER_PORT)
-    httpServer = vertx.createHttpServer(serverOptions)
+    httpServer = vertx.createHttpServer(httpServerOptionsOf(
+      host = DOMAIN,
+      port = HTTP_SERVER_PORT
+    ))
     
     router = Router.router(vertx)
     router.route()

@@ -1,7 +1,7 @@
 package com.ridwan.management.controller
 
-import com.google.common.hash.Hashing
 import com.ridwan.management.utility.generateRandomString
+import com.ridwan.management.utility.hashPassword
 import com.ridwan.management.verticle.MainVerticle
 import com.ridwan.mvc.Controller
 import com.ridwan.mvc.extension.endAsEmptyJson
@@ -15,7 +15,6 @@ import io.vertx.kotlin.ext.sql.updateWithParamsAwait
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 class MainController(verticle: MainVerticle) : Controller(verticle) {
@@ -62,16 +61,13 @@ class MainController(verticle: MainVerticle) : Controller(verticle) {
     
     val password = body.getString("password")
     val salt = generateRandomString(128)
-    
-    val hashedPassword = Hashing
-      .sha512()
-      .hashString(salt + password, StandardCharsets.UTF_8)
+    val hashedPassword = hashPassword(password, salt)
     
     val parameters = json {
       array(
         UUID.randomUUID().toString(),
         body.getString("username"),
-        hashedPassword.toString(),
+        hashedPassword,
         salt,
         body.getString("email"),
         body.getString("role")
