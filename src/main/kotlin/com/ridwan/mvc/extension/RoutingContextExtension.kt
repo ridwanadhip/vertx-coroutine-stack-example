@@ -1,6 +1,7 @@
 package com.ridwan.mvc.extension
 
 import com.ridwan.mvc.constant.ContentType
+import com.ridwan.mvc.constant.errorDescription
 import io.vertx.core.http.HttpHeaders
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -26,10 +27,11 @@ fun RoutingContext.endAsEmptyJson() {
     .end(JsonObject().encode())
 }
 
-fun RoutingContext.endAsErrorJson(errorCode: Int, message: String) {
+fun RoutingContext.endAsErrorJson(errorCode: Int, errorMessage: String?=null) {
   if (this.response().ended())
     return
   
+  val message = errorMessage ?: errorDescription[errorCode] ?: "error"
   this.response()
     .putHeader(HttpHeaders.CONTENT_TYPE, ContentType.JSON)
     .setStatusCode(errorCode)

@@ -24,8 +24,7 @@ abstract class ServerVerticle : CoroutineVerticle() {
     prepare()
     
     for (controller in controllers) {
-      controller.setupRouter()
-      router.mountSubRouter(controller.prefix, controller.router)
+      controller.setup()
     }
     
     httpServer.requestHandler(router).listenAwait()

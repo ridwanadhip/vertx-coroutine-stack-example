@@ -10,9 +10,15 @@ import kotlinx.coroutines.launch
 
 abstract class Controller(val verticle: ServerVerticle) {
   open val prefix: String = "/"
-  val router: Router = Router.router(verticle.vertx)
+  private lateinit var router: Router
   
-  abstract fun setupRouter()
+  abstract fun route()
+  
+  internal fun setup() {
+    router = Router.router(verticle.vertx)
+    route()
+    verticle.router.mountSubRouter(prefix, router)
+  }
   
   fun routeGet(path: String, handler: suspend (RoutingContext) -> Unit): Route {
     return router
