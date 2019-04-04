@@ -1,6 +1,5 @@
 package com.ridwan.management.controller
 
-import com.ridwan.management.extension.limit
 import com.ridwan.management.utility.generateRandomString
 import com.ridwan.management.utility.hashPassword
 import com.ridwan.management.verticle.MainVerticle
@@ -13,9 +12,6 @@ import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.ext.sql.queryWithParamsAwait
 import io.vertx.kotlin.ext.sql.updateWithParamsAwait
-import org.jooq.SQLDialect
-import org.jooq.impl.DSL
-import org.jooq.impl.DSL.*
 import java.util.*
 
 class MainController(verticle: MainVerticle) : Controller(verticle) {
@@ -31,16 +27,17 @@ class MainController(verticle: MainVerticle) : Controller(verticle) {
   }
   
   private suspend fun getUsersAction(context: RoutingContext) {
-    val query = DSL.using(SQLDialect.POSTGRES)
-      .select(field("id"), field("username"), field("email"), field("role"))
-      .from(table("users"))
-      .where(field("is_deleted").eq("?"))
-      .sql
+    val query = """
+      select id, username, email, role
+      from users
+      where is_deleted = ?
+      """
     
     val parameters = json { array(false) }
     val result = try {
       verticle.db.queryWithParamsAwait(query, parameters)
     } catch (e: Exception) {
+      verticle.logger.error(e.localizedMessage)
       context.endAsErrorJson(500)
       return
     }
@@ -50,18 +47,18 @@ class MainController(verticle: MainVerticle) : Controller(verticle) {
   
   private suspend fun getUserByIdAction(context: RoutingContext) {
     val userId = context.pathParam("id")
-    val query = DSL.using(SQLDialect.POSTGRES)
-      .select(field("id"), field("username"), field("email"), field("role"))
-      .from(table("users"))
-      .where(field("id").eq("?")
-        .and(field("is_deleted").eq("?")))
-      .limit("?")
-      .sql
+    val query = """
+      select id, username, email, role
+      from users
+      where id = ? and is_deleted = ?
+      limit 1
+      """
     
-    val parameters = json { array(userId, false, 1) }
+    val parameters = json { array(userId, false) }
     val result = try {
       verticle.db.queryWithParamsAwait(query, parameters)
     } catch (e: Exception) {
+      verticle.logger.error(e.localizedMessage)
       context.endAsErrorJson(500)
       return
     }
@@ -84,6 +81,11 @@ class MainController(verticle: MainVerticle) : Controller(verticle) {
     val password = body.getString("password")
     val salt = generateRandomString(128)
     val hashedPassword = hashPassword(password, salt)
+  
+    val query = """
+      insert into users (id, username, password, salt, email, role)
+      values (?, ?, ?, ?, ?, ?)
+      """
     
     val parameters = json {
       array(
@@ -96,19 +98,10 @@ class MainController(verticle: MainVerticle) : Controller(verticle) {
       )
     }
     
-    val query = DSL.using(SQLDialect.POSTGRES)
-      .insertInto(table("users"))
-      .set(field("id"), "?")
-      .set(field("username"), "?")
-      .set(field("password"), "?")
-      .set(field("salt"), "?")
-      .set(field("email"), "?")
-      .set(field("role"), "?")
-      .sql
-    
     try {
       verticle.db.updateWithParamsAwait(query, parameters)
     } catch (e: Exception) {
+      verticle.logger.error(e.localizedMessage)
       context.endAsErrorJson(500)
       return
     }
